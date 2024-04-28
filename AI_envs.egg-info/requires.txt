@@ -1,2 +1,2 @@
-pygame
 gym==0.17.2
+pygame

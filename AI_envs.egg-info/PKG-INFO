@@ -8,8 +8,10 @@ Author-email: ranobrega@gmail.com
 License: MIT
 Project-URL: Source, https://github.com/rafa-per/AI-envs.git
 Project-URL: Tracker, https://github.com/rafa-per/AI-envs.git/issues
+Platform: UNKNOWN
 Classifier: Programming Language :: Python :: 3
 Classifier: License :: OSI Approved :: MIT License
 License-File: LICENSE
-Requires-Dist: pygame
-Requires-Dist: gym==0.17.2
+
+UNKNOWN
+

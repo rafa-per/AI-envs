@@ -12,7 +12,7 @@ setuptools.setup(
         'Tracker': 'https://github.com/rafa-per/AI-envs.git/issues',
     },
     license="MIT",
-    packages=['AI-envs'],
+    packages=['AI_envs'],
     install_requires=['pygame', 'gym==0.17.2'],  # Exigindo a versão 0.17.2 do gym
     classifiers=[
         "Programming Language :: Python :: 3",

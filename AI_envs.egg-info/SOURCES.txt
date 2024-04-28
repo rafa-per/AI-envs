@@ -1,9 +1,9 @@
 LICENSE
 README.md
 setup.py
-AI-envs/__init__.py
-AI-envs/import_fix.py
-AI-envs/pong.py
+AI_envs/__init__.py
+AI_envs/import_fix.py
+AI_envs/pong.py
 AI_envs.egg-info/PKG-INFO
 AI_envs.egg-info/SOURCES.txt
 AI_envs.egg-info/dependency_links.txt

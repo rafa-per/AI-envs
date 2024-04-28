@@ -1,1 +1,1 @@
-AI-envs
+AI_envs
