@@ -1,0 +1,17 @@
+Metadata-Version: 2.1
+Name: AI-envs
+Version: 0.1.1
+Summary: Ambientes do gym
+Home-page: https://github.com/rafa-per/AI-envs.git
+Author: Rafael Pereira
+Author-email: ranobrega@gmail.com
+License: MIT
+Project-URL: Source, https://github.com/rafa-per/AI-envs.git
+Project-URL: Tracker, https://github.com/rafa-per/AI-envs.git/issues
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+License-File: LICENSE
+
+UNKNOWN
+
