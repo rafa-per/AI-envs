@@ -2,7 +2,7 @@ import setuptools
 
 setuptools.setup(
     name="AI-envs",
-    version="0.1.1",
+    version="0.1.3",
     author="Rafael Pereira",
     author_email="ranobrega@gmail.com",
     description="Ambientes do gym",
