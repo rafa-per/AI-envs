@@ -1,5 +1,3 @@
-from tensorflow import keras
-from tensorflow.keras import layers
 import tensorflow as tf
 
 import numpy as np
@@ -34,14 +32,14 @@ class Agent():
 
   def model_builder(self):
         
-    model = tf.keras.models.Sequential()      
-    model.add(layers.Dense(units=32, activation='relu', input_dim=self.state_size))
-    model.add(layers.Dense(units=64, activation='relu'))
-    model.add(layers.Dense(units=128, activation='relu'))
-    model.add(layers.Dense(units=self.action_space, activation='linear')) # De maneira geral, teremos 3 saída na rede geral (número de espaços de ação)
+    model = tf.keras.models.Sequential()     
+    model.add(tf.keras.layers.Dense(units=32, activation='relu', input_dim=self.state_size))
+    model.add(tf.keras.layers.Dense(units=64, activation='relu'))
+    model.add(tf.keras.layers.Dense(units=128, activation='relu'))
+    model.add(tf.keras.layers.Dense(units=self.action_space, activation='linear')) # De maneira geral, teremos 3 saída na rede geral (número de espaços de ação)
 
 
-    model.compile(loss='mse', optimizer=keras.optimizers.Adam(learning_rate=0.001)); # Compilamos o modelo
+    model.compile(loss='mse', optimizer=tf.keras.optimizers.Adam(learning_rate=0.001)); # Compilamos o modelo
 
     return model # Retornamos o modelo pela função.
 
