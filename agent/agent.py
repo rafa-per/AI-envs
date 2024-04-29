@@ -1,60 +1,97 @@
-import keras
-from keras.models import Sequential
-from keras.models import load_model
-from keras.layers import Dense
-from keras.optimizers import Adam
+from tensorflow import keras
+from tensorflow.keras import layers
+import tensorflow as tf
 
 import numpy as np
 import random
 from collections import deque
+# Defining our Deep Q-Learning Trader
 
-class Agent:
-	def __init__(self, state_size, is_eval=False, model_name=""):
-		self.state_size = state_size # normalized previous days
-		self.action_size = 3 # sit, buy, sell
-		self.memory = deque(maxlen=1000)
-		self.inventory = []
-		self.model_name = model_name
-		self.is_eval = is_eval
+class Agent():  
 
-		self.gamma = 0.95
-		self.epsilon = 1.0
-		self.epsilon_min = 0.01
-		self.epsilon_decay = 0.995
+# -----------------------------------------------------------------------
 
-		self.model = load_model("models/" + model_name) if is_eval else self._model()
+  # CONSTRUTOR
 
-	def _model(self):
-		model = Sequential()
-		model.add(Dense(units=64, input_dim=self.state_size, activation="relu"))
-		model.add(Dense(units=32, activation="relu"))
-		model.add(Dense(units=8, activation="relu"))
-		model.add(Dense(self.action_size, activation="linear"))
-		model.compile(loss="mse", optimizer=Adam(lr=0.001))
+  def __init__(self, state_size, action_space=3, model_name="AITrader"):
+    
+    self.state_size = state_size # Tamanho da entrada da rede neural 
+    self.action_space = action_space # Espaço de ação será 3, Comprar, Vender, Sem Ação (Tamanho da saída da rede neural)
+    self.memory = deque(maxlen=2000) # Memória com 2000 posições. A função Deque permite adicionar elementos ao final, enquanto remove elementos do início.
+    self.inventory = [] # Terá as comprar que já fizemos
+    self.model_name = model_name # Nome do modelo para o Keras
+    
+    self.gamma = 0.95 # Parâmetro que ajudará a maximizar a recompensa
+    self.epsilon = 1.0 # Taxa de aleatoriedade para atitudes ganacioas do algorítimo.
+    self.epsilon_final = 0.01 # Taxa final reduzida
+    self.epsilon_decay = 0.995 # Velocidade de decaimento da taxa
 
-		return model
+    self.model = self.model_builder() # Inicializa um modelo e de rede neural e salva na classe
 
-	def act(self, state):
-		if not self.is_eval and np.random.rand() <= self.epsilon:
-			return random.randrange(self.action_size)
+# -----------------------------------------------------------------------
 
-		options = self.model.predict(state)
-		return np.argmax(options[0])
+  # DEFININDO A REDE NEURAL
 
-	def expReplay(self, batch_size):
-		mini_batch = []
-		l = len(self.memory)
-		for i in xrange(l - batch_size + 1, l):
-			mini_batch.append(self.memory[i])
+  def model_builder(self):
+        
+    model = tf.keras.models.Sequential()      
+    model.add(layers.Dense(units=32, activation='relu', input_dim=self.state_size))
+    model.add(layers.Dense(units=64, activation='relu'))
+    model.add(layers.Dense(units=128, activation='relu'))
+    model.add(layers.Dense(units=self.action_space, activation='linear')) # De maneira geral, teremos 3 saída na rede geral (número de espaços de ação)
 
-		for state, action, reward, next_state, done in mini_batch:
-			target = reward
-			if not done:
-				target = reward + self.gamma * np.amax(self.model.predict(next_state)[0])
 
-			target_f = self.model.predict(state)
-			target_f[0][action] = target
-			self.model.fit(state, target_f, epochs=1, verbose=0)
+    model.compile(loss='mse', optimizer=keras.optimizers.Adam(learning_rate=0.001)); # Compilamos o modelo
 
-		if self.epsilon > self.epsilon_min:
-			self.epsilon *= self.epsilon_decay 
+    return model # Retornamos o modelo pela função.
+
+# -----------------------------------------------------------------------
+
+  # FUNÇÃO DE TRADE
+  # Usa o Epsilon e um número aleatório para definir se usará um dado aleatório ou a previsão da rede.
+
+  def trade(self, state):
+    print('TRADE FUNCTION:')
+
+    if random.random() <= self.epsilon:
+      return random.randrange(self.action_space)
+    actions = self.model.predict(state)
+    print('Actions = ', actions)
+    print('Actions Argmax = ', np.argmax(actions[0]))
+
+    return np.argmax(actions[0])
+
+# -----------------------------------------------------------------------
+
+  # LOTE DE TREINAMENTO
+
+  # Definindo o modelo para treinamento do lote
+
+  def batch_train(self, batch_size): # Função que tem o tamanho do lote como argumento
+
+    batch = [] # Iremos usar a memória como lote, por isso iniciamos com uma lista vazia
+
+    # Iteramos sobre a memória, adicionando seus elementos ao lote batch
+    for i in range(len(self.memory) - batch_size + 1, len(self.memory)): 
+      batch.append(self.memory[i])
+
+    # Agora temos um lote de dados e devemos iterar sobre cada estado, recompensa,
+    # proximo_estado e conclusão do lote e treinar o modelo com isso.
+    for state, action, reward, next_state, done in batch:
+      reward = reward
+
+      # Se não estivermos no último agente da memória, então calculamos a
+      # recompensa descontando a recompensa total da recompensa atual.
+      if not done:
+        reward = reward + self.gamma * np.amax(self.model.predict(next_state)[0])
+
+      # Fazemos uma previsão e alocamos à varivel target
+      target = self.model.predict(state)
+      target[0][action] = reward
+
+      # Treinamos o modelo com o estado, usando a previsão como resultado esperado.
+      self.model.fit(state, target, epochs=1, verbose=0)
+
+    # Por fim decrementamos o epsilon a fim de gradativamente diminuir tentativas ganaciosas. 
+    if self.epsilon > self.epsilon_final:
+      self.epsilon *= self.epsilon_decay
